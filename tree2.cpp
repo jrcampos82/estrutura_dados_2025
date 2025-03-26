@@ -114,7 +114,36 @@ public:
     //  2. Nó com apenas um filho (esquerdo ou direito)
     //  3. Nó com dois filhos (troca pelo sucessor ou predecessor e deleta o substituído)
     TreeNode* deleteNode(int key) {
-       
+        if(key < data && left){
+            left = left->deleteNode(key);
+        }
+
+        else if (key > data && right){
+            right = right->deleteNode(key);
+        }
+
+        else if (key == data){
+            // Caso 1: sem filho a esq
+            if(!left){
+                TreeNode* temp = right;
+                this->right = nullptr; //
+                delete this;
+                return temp;
+            }
+
+            //Caso 2: sem filho a dir
+            if(!right){
+                TreeNode* temp = left;
+                this->left = nullptr;
+                delete this;
+                return temp;
+            }
+
+            TreeNode* temp = minValueNode(right);
+            data = temp->data;
+            right = right->deleteNode(temp->data);
+
+        }      
 
         // Retorna o ponteiro atual (em caso de não remoção)
         return this;
@@ -123,33 +152,81 @@ public:
     // Libera recursivamente todos os nós da subárvore
     // transformando o nó atual em uma árvore vazia
     void clear() {
-        
+        if (left){
+            left->clear();
+            delete left;
+        }
+        if (right){
+            right->clear();
+            delete right;
+        }
     }
 
     // Retorna o valor mínimo da árvore
     int getMin() {
-        return 0;
+        if (!left) return data;
+        return left->getMin();         
     }
 
     // Retorna o valor máximo da árvore
     int getMax() {
-        return 0;
+        if (!right) return data;
+        return right->getMax();
     }
 
     // Retorna a contagem total de nós na subárvore
     int countNodes() {
-        
-        return 0;
+        int count = 1;
+        if(left)
+            count += left->countNodes();
+        if (right)
+            count += right->countNodes();
+        return count;
     }
 
     // Retorna a contagem de folhas (nós sem filhos)
     int countLeaves() {
-       return 0; 
+
+        if (!left && !right)
+            return 1;
+        int leaves = 0;
+        if (left)
+            leaves += left->countLeaves();
+        if (right)
+            leaves += right->countLeaves();
+
+       return leaves; 
     }
 };
 
 int main() {
-   
+    TreeNode* root = new TreeNode(50);
+    root->insert(30);
+    root->insert(20);
+    root->insert(40);
+    root->insert(70);
+    root->insert(60);
+    root->insert(80);
+
+    cout << "BST -- Aula 6" << endl;
+
+    root->printTree();
+
+    int deleteValue = 0;
+    cout << "Digite um valor para deletar: ";
+    cin >> deleteValue;
+
+    root = root->deleteNode(deleteValue);
+
+    cout << "Arvore apos deletar" << endl;
+    root->printTree();
+
+    cout <<  "Menor valor" << root->getMin() << endl;
+    cout <<  "Maior valor" << root->getMax() << endl;
+
+    // Exibe quantidade de nós e folhas
+    cout << "Quantidade total de nós: " << root->countNodes() << "\n";
+    cout << "Quantidade de folhas: " << root->countLeaves() << "\n";
 
     return 0;
 }
